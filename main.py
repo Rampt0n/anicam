@@ -3,7 +3,7 @@ import pyvirtualcam
 from overlay_utils import  blur_image, apply_cover_img_on_face
 
 
-# Load the aubergine image with alpha channel (RGBA)
+# Load the cover image with alpha channel (RGBA)
 cover_img = cv2.imread("images/aubergine.png", cv2.IMREAD_UNCHANGED)
 # Load eye images with alpha channel (RGBA)
 eye_img = cv2.imread("images/eye.png", cv2.IMREAD_UNCHANGED)
@@ -12,9 +12,10 @@ eye_color = eye_img[:, :, :3]
 
 # Load the pre-trained Haar Cascade for face detection
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-# Load the pre-trained facial landmarks model from OpenCV
+eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_eye.xml")
+mouth_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_smile.xml")
 
-# Scaling factor for the aubergine relative to face size
+
 cover_scaling = 1.5  # Scale aubergine size (1.0 = same size as face, >1 = larger)
 eye_scaling = 0.3
 

@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 
 
 def blur_image(frame, kernel_size=(15, 15)):
