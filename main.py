@@ -1,6 +1,7 @@
 import cv2
 import pyvirtualcam
 from overlay_utils import  blur_image, apply_cover_img_on_face
+from pygrabber.dshow_graph import FilterGraph
 
 
 # Load the cover image with alpha channel (RGBA)
@@ -34,41 +35,42 @@ fps = int(cap.get(cv2.CAP_PROP_FPS))
 
 previous_face_location = [[1, 2, 3, 250]]
 
+with pyvirtualcam.Camera(width=frame_width, height=frame_height, fps=fps,
+                         fmt=pyvirtualcam.PixelFormat.BGR) as virtual_cam:
 
-while True:
+    while True:
 
-    ret, frame = cap.read()
+        ret, frame = cap.read()
 
-    if not ret:
-        print("Failed to grab frame.")
-        break
+        if not ret:
+            print("Failed to grab frame.")
+            break
 
-    frame = blur_image(frame, kernel_size=(25, 25))
-    # Convert to grayscale for face detection
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame = blur_image(frame, kernel_size=(25, 25))
+        # Convert to grayscale for face detection
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Detect faces
-    faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        # Detect faces
+        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
-    if len(faces) < 1:   # if no face is detected, the latest face location will be useds
-        face = previous_face_location
-    else:
-        face = faces
-        previous_face_location = faces
+        if len(faces) < 1:   # if no face is detected, the latest face location will be useds
+            face = previous_face_location
+        else:
+            face = faces
+            previous_face_location = faces
 
-    frame = apply_cover_img_on_face(frame, face, cover_scaling, cover_img, eye_scaling, eye_color, eye_alpha)
+        frame = apply_cover_img_on_face(frame, face, cover_scaling, cover_img, eye_scaling, eye_color, eye_alpha)
 
-    with pyvirtualcam.Camera(width=frame_width, height=frame_height, fps=fps,
-                             fmt=pyvirtualcam.PixelFormat.BGR) as virtual_cam:
+
         virtual_cam.send(frame)
         virtual_cam.sleep_until_next_frame()
 
-    # Show the frame with the cover replacement
-    cv2.imshow("Aubergine Face Replacement - quit with  'q'", frame)
+        # Show the frame with the cover replacement
+        cv2.imshow("Aubergine Face Replacement - quit with  'q'", frame)
 
-    # Quit on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        # Quit on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 # Release resources
 cap.release()
